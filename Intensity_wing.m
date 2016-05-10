@@ -3,6 +3,7 @@ clc
 clear all
 close all
 
+cd('../');
 mkdir('data/Cells');
 mkdir('data/Distribution no BG');
 mkdir('data/Distribution with BG');
@@ -13,6 +14,7 @@ mkdir('data/Summary');
 cd('data/tifs_original');
 files_tif = dir('*.tif');
 cd('../../');
+cd('embryo-intensity/');
 
 Cells_total = zeros(1,6); % Information about all cells from all images
 Cells_number = zeros(1,2); % Number of cells in all images
@@ -39,11 +41,14 @@ for g=1:numel(files_tif)
     
     %% Open images and modify
     Cad = [num2str(g),'.tif'];
+    cd('../');
     cd('data/tifs_original');
     Cad_im=imread(Cad);
     Cad_im2=uint8(Cad_im-1);
     cd('../../');
+    cd('embryo-intensity/');
     
+    cd('../');
     Folder = ['data/tifs_8bit/', num2str(g)];
     cd(Folder);
     V=imread('vertices.png');
@@ -61,6 +66,7 @@ for g=1:numel(files_tif)
     se90 = strel('line', 2, 90);
     se0 = strel('line', 2, 0);
     cd('../../../');
+    cd('embryo-intensity/');
     
     % I_cells - inverted image of all cells that are completely in frame;
     % s_cells - individual cells as objects
@@ -250,40 +256,50 @@ for g=1:numel(files_tif)
     
     %% Writing data for individual images
     % Borders data: N_distribution_with_BG - after BG subtraction;
+    cd('../');
     cd('data/Distribution with BG');
     Otput_Graph = [num2str(g),'_distribution_with_BG.tif'];
     hold off
     print(image1, '-dtiff', '-r300', Otput_Graph);
     cd('../../');
+    cd('embryo-intensity/');
     
     % Borders data: N_distribution_with_BG2 - after BG subtraction, BG2;
+    cd('../');
     cd('data/Distribution with BG2');
     Otput_Graph = [num2str(g),'_distribution_with_BG2.tif'];
     hold off
     print(image2, '-dtiff', '-r300', Otput_Graph);
     cd('../../');
+    cd('embryo-intensity/');
     
     % N_distribution_no_BG - without BG subtraction;
+    cd('../');
     cd('data/Distribution no BG');
     Otput_Graph = [num2str(g),'_distribution_no_BG.tif'];
     hold off
     print(image3, '-dtiff', '-r300', Otput_Graph);
     cd('../../');
+    cd('embryo-intensity/');
     
     % N_intensity - information about individual borders;
+    cd('../');
     cd('data/Intensity');
     Otput_Intensity = [num2str(g),'_intensity.csv'];
     headers = {'Angle', 'Intensity-BG', 'Intensity-BG2', 'Intensity', 'Length'};
     csvwrite_with_headers(Otput_Intensity,intensity, headers);
     close all;
     cd('../../');
+    cd('embryo-intensity/');
     
     % N_area - information about individual cells
+    cd('../');
     cd('data/Cells');
     Otput_Celldata = [num2str(g),'_area.csv'];
     headers = {'Cell', 'Area', 'Intensity', 'Orientation', 'Eccentricity', 'Elongation', 'Neighbours'};
     csvwrite_with_headers(Otput_Celldata,celldata,headers);
     cd('../../');
+    cd('embryo-intensity/');
     
 end
 
@@ -343,9 +359,10 @@ axis([0 100 0 1000]);
 
 %% Writing combined data
 %Properties of individual cells
+cd('../');
 cd('data/Summary');
 Otput_All_Celldata = ['vertices_all.csv'];
-headers = {'Embryo', 'Cell', 'Area', 'Intensity', 'Orientation', 'Eccentricity', 'Elongation', 'Neighbours'};
+headers = {'Wing', 'Cell', 'Area', 'Intensity', 'Orientation', 'Eccentricity', 'Elongation', 'Neighbours'};
 csvwrite_with_headers(Otput_All_Celldata,Cells_total, headers);
 
 %Number of cells in each wing
@@ -378,5 +395,7 @@ print(image6, '-dtiff', '-r300', Otput_Graph);
 headers = {'Wing', 'Intensity-BG', 'Intensity-BG2', 'Intensity', 'BG', 'BG2'};
 csvwrite_with_headers('Intensity_wing.csv',Intensity_average, headers);
 cd('../../');
+cd('embryo-intensity/');
+
 
 close all;
