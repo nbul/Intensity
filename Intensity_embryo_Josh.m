@@ -2,13 +2,12 @@
 clc
 clear all
 close all
-
+cd('../');
 mkdir('data/Cells');
 mkdir('data/Distribution no BG');
 mkdir('data/Distribution with BG');
 mkdir('data/Intensity');
 mkdir('data/Summary');
-
 cd('data/tifs_original');
 files_tif = dir('*.tif');
 cd('../../');
@@ -219,7 +218,7 @@ for g=1:numel(files_tif)
             q2 = boundary_value(1,2);
             if s_cells(q).Area>300 && s_cells(q2).Area>300 && s_cells(q).Area<15000 && s_cells(q2).Area<15000
                 if Junction_cad(n).Perimeter/2>5
-                    if Junction_cad(n).MeanIntensity>BG
+                    %if Junction_cad(n).MeanIntensity>BG
                         % Normalizing orientation relative to image
                         % (average cell) orientation)
                         if abs(Junction_cad(n).Orientation - cell_orientation)>90
@@ -275,7 +274,7 @@ for g=1:numel(files_tif)
                         Intensity_total(n_0_90,2) = intensity(k,2);
                         Intensity_total(n_0_90,3) = intensity(k,3);
                         Intensity_total(n_0_90,4) = intensity(k,4);
-                    end
+                    %end
                     
                 end
             end
