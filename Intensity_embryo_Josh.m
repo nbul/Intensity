@@ -459,5 +459,6 @@ Otput_Graph = ['Distribution_all_no_BG.tif'];
 hold off
 print(image4, '-dtiff', '-r300', Otput_Graph);
 cd('../../');
+cd('embryo-intensity/');
 
 close all;
