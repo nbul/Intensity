@@ -44,7 +44,7 @@ for g=1:numel(files_tif)
     cd('../');
     cd('data/tifs_original');
     Cad_im=imread(Cad);
-    Cad_im2=uint8(Cad_im-1);
+    Cad_im2=uint16(Cad_im);
     cd('../../');
     cd('embryo-intensity/');
     
@@ -63,8 +63,8 @@ for g=1:numel(files_tif)
     
     I=imread('tracked_bd.png');
     I2=im2bw(I,1/255);
-    se90 = strel('line', 2, 90);
-    se0 = strel('line', 2, 0);
+    se90 = strel('line', 5, 90);
+    se0 = strel('line', 5, 0);
     cd('../../../');
     cd('embryo-intensity/');
     
@@ -85,6 +85,11 @@ for g=1:numel(files_tif)
     cc_borders=bwconncomp(I_borders);
     Junction_cad=regionprops(cc_borders,Cad_im,'MeanIntensity','Orientation','Perimeter', 'centroid', 'Extrema', 'PixelList');
     
+%     BWoutlineall = bwperim(I_borders);
+%     Segoutall = ceil(Cad_im2/16);
+%     Segoutall(BWoutlineall) = 255;
+%     figure, imshow(Segoutall, [0 255]), title('segmented image')
+%     
     %% Image data: BG and orientation
     % Background and image orientation: measuring summarized background and
     % summarized orietnations of positively and negatively oriented cells
@@ -93,7 +98,7 @@ for g=1:numel(files_tif)
     end
     
     BG2=BG2/numel(s_cells);
-    BG = graythresh(Cad_im2)*256;
+    BG = graythresh(Cad_im2)*256*16;
     
     %% Cell data
     k=0;
@@ -157,19 +162,32 @@ for g=1:numel(files_tif)
         % Finding borders between two cells that are completely in frame
         boundary = bwtraceboundary(I_borders, [Junction_cad(n).Extrema(3,2) + 0.5  Junction_cad(n).Extrema(3,1) - 0.5], 'NW');
         boundary_value = 0;
+        Size_im = size(Cad_im);
         for i=1:size(boundary*4)
-            boundary_value(i*4-3) = L_cells(boundary(i,1)-1,boundary(i,2)-1);
-            boundary_value(i*4-2) = L_cells(boundary(i,1)-1,boundary(i,2)+1);
-            boundary_value(i*4-1) = L_cells(boundary(i,1)+1,boundary(i,2)-1);
-            boundary_value(i*4) = L_cells(boundary(i,1)+1,boundary(i,2)+1);
+            if boundary(i,1)-1>0 && boundary(i,2)-1>0
+                boundary_value(i*4-3) = L_cells(boundary(i,1)-1,boundary(i,2)-1);
+            else boundary_value(i*4-3) = 0;
+            end
+            if boundary(i,1)-1>0 && boundary(i,2)<Size_im(2)
+                boundary_value(i*4-2) = L_cells(boundary(i,1)-1,boundary(i,2)+1);
+            else boundary_value(i*4-2) = 0;
+            end
+            if boundary(i,1)+1<Size_im(1)+1 && boundary(i,2)-1>0
+                boundary_value(i*4-1) = L_cells(boundary(i,1)+1,boundary(i,2)-1);
+            else boundary_value(i*4-2) = 0;
+            end
+            if boundary(i,1)+1<Size_im(1)+1 && boundary(i,2)+1<Size_im(2)+1
+                boundary_value(i*4) = L_cells(boundary(i,1)+1,boundary(i,2)+1);
+            else boundary_value(i*4-2) = 0;
+            end
         end
         boundary_value = unique(boundary_value);
         boundary_value(boundary_value==0) = [];
         if length(boundary_value)==2
             q = boundary_value(1,1);
             q2 = boundary_value(1,2);
-            if Junction_cad(n).Perimeter/2>5
-                if Junction_cad(n).MeanIntensity>BG
+            if Junction_cad(n).Perimeter/2>5 
+                if Junction_cad(n).MeanIntensity>BG2
                     % Writing down parametes of individual junctions
                     % that are longer than 5px and are surrounded by
                     % cells with area>1000px and are completely within
