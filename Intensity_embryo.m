@@ -1,24 +1,10 @@
-%% Clear all and initial parameters
-clc
-clear all
-close all
-cd('../');
-mkdir('data/Cells');
-mkdir('data/Distribution no BG');
-mkdir('data/Distribution with BG');
-mkdir('data/Intensity');
-mkdir('data/Summary');
-cd('data/tifs_original');
-files_tif = dir('*.tif');
-cd('../../');
-
+%% Assigning memory
 Cells_total = zeros(1,6); % Information about all cells from all images
 Cells_number = zeros(1,2); % Number of cells in all images
 n_all = 0; % Counter for all cells
 
 Intensity_total = zeros(1,4); % Intensity of all individual borders in all embryos
 Intensity_average = zeros(1,8);
-Intensity_angle = zeros(1,9);
 Intensity_10 = zeros(1,4); % Intensity of individual borders 0-10° in all embryos
 Intensity_40 = zeros(1,4); % Intensity of individual borders 10-40° in all embryos
 Intensity_90 = zeros(1,4); % Intensity of individual borders 40-90° in all embryos
@@ -26,6 +12,18 @@ n_0_90 = 0; % Number of all individual borders in all embryos
 n10=0; % Number of individual borders 0-10° in all embryos
 n40=0; % Number of individual borders 10-40° in all embryos
 n90=0; % Number of individual borders 40-90° in all embryos
+
+precision = 2;
+x = -90:0.5:90;
+%dilation of vertices
+se90V = strel('line', 8, 90);
+se0V = strel('line', 7, 0);
+%dilation of borders
+se90I = strel('line', 2, 90);
+se0I = strel('line', 2, 0);
+% dilation cell
+se90 = strel('line', 4, 90);
+se0 = strel('line', 4, 0);
 
 %% Analysis of individual images
 for g=1:numel(files_tif)
@@ -40,38 +38,33 @@ for g=1:numel(files_tif)
     q=0; % First complete cell adjacent to the border
     q2=0; %Second complete cell adjacent to the border
     celldata = zeros(2,7); %Array with data of individual cells
-    cell_temp = zeros(2,8); % Temporary cell data file
     intensity = zeros(2,2); %Array with data of individual borders
     
     
     %% Open images and modify
-    Cad = [num2str(g),'.tif'];
-    cd('data/tifs_original');
-    Cad_im=imread(Cad);
-    cd('../../');
-    
-    Folder = ['data/tifs_8bit/', num2str(g)];
-    cd(Folder);
-    V=imread('vertices.png');
-    V=im2bw(V,1/255);
-    se90 = strel('line', 8, 90);
-    se0 = strel('line', 7, 0);
+   Cad = [num2str(g),'.tif'];
+    cd(tif16_dir);
+    Cad_im = imread(Cad);
+    Cad_im2 = uint16(Cad_im);
+    bd_dir = [tif8_dir,'/', num2str(g)];
+    cd(bd_dir);
+    %Open image with vertices
+    V = imread('vertices.png');
+    V = im2bw(V,1/255);
     % Vdil - dilated image of all vertices
-    Vdil = imdilate(V, [se90 se0]);
+    Vdil = imdilate(V, [se90V se0V]);
     % Individual vertices as objects
     cc_Vdil = bwconncomp(Vdil);
     L_Vdil = labelmatrix(cc_Vdil);
     
     I=imread('tracked_bd.png');
     I2=im2bw(I,1/255);
-    se90 = strel('line', 2, 90);
-    se0 = strel('line', 2, 0);
-    cd('../../../');
-    
+    I3 = imdilate(I2, [se90I se0I]);
+    cd(currdir);
     % I_cells - inverted image of all cells that are completely in frame;
     % s_cells - individual cells as objects
-    I_cells = imdilate(I2, [se90 se0]);
-    I_cells=imcomplement(I_cells);
+
+    I_cells=imcomplement(I3);
     I_cells=imclearborder(I_cells);
     cc_cells=bwconncomp(I_cells);
     L_cells=labelmatrix(cc_cells);
@@ -79,8 +72,7 @@ for g=1:numel(files_tif)
     
     % I_borders - all cell-cell borders of the cells that are completely in
     % frame; Junction_cad - individual borders as objects
-    I_borders = imdilate(I2, [se90 se0]);
-    I_borders = imsubtract(I_borders, Vdil);
+    I_borders = imsubtract(I3, Vdil);
     I_borders = im2bw(I_borders, 1/255);
     cc_borders=bwconncomp(I_borders);
     Junction_cad=regionprops(cc_borders,Cad_im,'MeanIntensity','Orientation','Perimeter', 'centroid', 'Extrema', 'PixelList');
@@ -135,7 +127,6 @@ for g=1:numel(files_tif)
     k=0;
     for n=1:numel(s_cells)
         if s_cells(n).Area>300 && s_cells(n).Area<15000
-            pixel_value = 0;
             newImg = im2bw(I,255/255);
             newImg( vertcat( s_cells(n).PixelIdxList ) ) = 1; % getting cell n only
             se90 = strel('line', 4, 90);
@@ -143,6 +134,7 @@ for g=1:numel(files_tif)
             newImg = imdilate(newImg, [se90 se0]);
             cc_newImg=bwconncomp(newImg);
             s_newImg=regionprops(cc_newImg, newImg, 'Area', 'PixelList');
+            pixel_value = zeros(numel(s_newImg(1).Area),1);
             for i=1:s_newImg(1).Area
                 pixel_value(i) = L_Vdil(s_newImg(1).PixelList(i,2),s_newImg(1).PixelList(i,1));
             end
@@ -201,11 +193,19 @@ for g=1:numel(files_tif)
     k10=0;
     k40=0;
     k90=0;
+    
+    %setting cutoff values for border intensity
+    if choice == 1
+        cutoff = BG;
+    else
+        cutoff = 0;
+    end
+    
     for n=1:numel(Junction_cad)
         % Finding borders between two cells that are completely in frame
         boundary = bwtraceboundary(I_borders, [Junction_cad(n).Extrema(3,2) + 0.5  Junction_cad(n).Extrema(3,1) - 0.5], 'NW');
-        boundary_value = 0;
-        for i=1:size(boundary*4)
+        boundary_value = zeros(1,length(boundary*4));
+        for i=1:length(boundary*4)
             boundary_value(i*4-3) = L_cells(boundary(i,1)-1,boundary(i,2)-1);
             boundary_value(i*4-2) = L_cells(boundary(i,1)-1,boundary(i,2)+1);
             boundary_value(i*4-1) = L_cells(boundary(i,1)+1,boundary(i,2)-1);
@@ -218,7 +218,7 @@ for g=1:numel(files_tif)
             q2 = boundary_value(1,2);
             if s_cells(q).Area>300 && s_cells(q2).Area>300 && s_cells(q).Area<15000 && s_cells(q2).Area<15000
                 if Junction_cad(n).Perimeter/2>5
-                    %if Junction_cad(n).MeanIntensity>BG
+                    if Junction_cad(n).MeanIntensity>cutoff
                         % Normalizing orientation relative to image
                         % (average cell) orientation)
                         if abs(Junction_cad(n).Orientation - cell_orientation)>90
@@ -274,7 +274,7 @@ for g=1:numel(files_tif)
                         Intensity_total(n_0_90,2) = intensity(k,2);
                         Intensity_total(n_0_90,3) = intensity(k,3);
                         Intensity_total(n_0_90,4) = intensity(k,4);
-                    %end
+                    end
                     
                 end
             end
@@ -302,7 +302,6 @@ for g=1:numel(files_tif)
     %% Fitting and plotting
     equation1=polyfit(intensity(:,1),intensity(:,2),1); % With background subtraction
     equation2=polyfit(intensity(:,1),intensity(:,3),1); % Without background subtraction
-    x = 0:0.5:90;
     y1 = equation1(1,1)*x + equation1(1,2);
     y2 = equation2(1,1)*x + equation2(1,2);
     
@@ -315,10 +314,9 @@ for g=1:numel(files_tif)
     ylabel('Fluorescence intensity', 'fontsize',16,'fontweight','b');
     hold on
     plot(x, y1 , '-b', 'LineWidth',3);
-    precision = 2;
     text_control = ['embryo', num2str(g), ': ', num2str(equation1(1,2), precision) ' + ' num2str(equation1(1,1), precision) '*x' ];
     text(98, 50, text_control, 'HorizontalAlignment','right', 'fontsize',14, 'fontweight','b');
-    axis([0 100 0 1000]);
+    axis([0 90 0 max(intensity(:,2))]);
     
     % Plot image of fitted intensities without background subtraction
     image2=figure;
@@ -329,40 +327,38 @@ for g=1:numel(files_tif)
     ylabel('Fluorescence intensity', 'fontsize',16,'fontweight','b');
     hold on
     plot(x, y2 , '-b', 'LineWidth',3);
-    precision = 2;
     text_control = ['embryo', num2str(g), ': ', num2str(equation2(1,2), precision) ' + ' num2str(equation2(1,1), precision) '*x' ];
     text(98, 50, text_control, 'HorizontalAlignment','right', 'fontsize',14, 'fontweight','b');
-    axis([0 100 0 1000]);
+    axis([0 90 0 max(intensity(:,3))]);
     
     %% Writing data for individual images
     % Borders data: N_distribution_with_BG - after BG subtraction;
-    cd('data/Distribution with BG');
+    % Borders data: N_distribution_with_BG1 - after BG subtraction, BG;
+    cd(dist1_dir);
     Otput_Graph = [num2str(g),'_distribution_with_BG.tif'];
     hold off
     print(image1, '-dtiff', '-r300', Otput_Graph);
-    cd('../../');
     
     % N_distribution_no_BG - without BG subtraction;
-    cd('data/Distribution no BG');
+    cd(dist2_dir);                     
     Otput_Graph = [num2str(g),'_distribution_no_BG.tif'];
     hold off
-    print(image2, '-dtiff', '-r300', Otput_Graph);
-    cd('../../');
+    print(image2, '-dtiff', '-r300', Otput_Graph); 
+    
     
     % N_intensity - information about individual borders;
-    cd('data/Intensity');
+    cd(int_dir);
     Otput_Intensity = [num2str(g),'_intensity.csv'];
     headers = {'Angle', 'Intensity-BG', 'Intensity', 'Length'};
     csvwrite_with_headers(Otput_Intensity,intensity, headers);
     close all;
-    cd('../../');
     
     % N_area - information about individual cells
-    cd('data/Cells');
+    cd(cells_dir);
     Otput_Celldata = [num2str(g),'_area.csv'];
     headers = {'Cell', 'Area', 'Intensity', 'Orientation', 'Eccentricity', 'Elongation', 'Neighbours'};
     csvwrite_with_headers(Otput_Celldata,celldata,headers);
-    cd('../../');
+
     
 end
 
@@ -392,7 +388,6 @@ end
 %Fitting summarized data with lines
 equation1=polyfit(Intensity_total(:,1),Intensity_total(:,2),1); %with background subtraction
 equation2=polyfit(Intensity_total(:,1),Intensity_total(:,3),1); % without background subtraction
-x = 0:0.5:90;
 y1 = equation1(1,1)*x + equation1(1,2);
 y2 = equation2(1,1)*x + equation2(1,2);
 
@@ -405,10 +400,9 @@ xlabel('Relative angle', 'fontsize',16,'fontweight','b');
 ylabel('Fluorescence intensity', 'fontsize',16,'fontweight','b');
 hold on
 plot(x, y1 , '-b', 'LineWidth',3);
-precision = 2;
 text_control = ['embryo', num2str(g), ': ', num2str(equation1(1,2), precision) ' + ' num2str(equation1(1,1), precision) '*x' ];
 text(98, 50, text_control, 'HorizontalAlignment','right', 'fontsize',14, 'fontweight','b');
-axis([0 100 0 1000]);
+axis([0 90 0 max(Intensity_total(:,2))]);
 
 % Plot image of fitted intensities without background subtraction
 image4=figure;
@@ -419,20 +413,19 @@ xlabel('Relative angle', 'fontsize',16,'fontweight','b');
 ylabel('Fluorescence intensity', 'fontsize',16,'fontweight','b');
 hold on
 plot(x, y2 , '-b', 'LineWidth',3);
-precision = 2;
 text_control = ['embryo', num2str(g), ': ', num2str(equation2(1,2), precision) ' + ' num2str(equation2(1,1), precision) '*x' ];
 text(98, 50, text_control, 'HorizontalAlignment','right', 'fontsize',14, 'fontweight','b');
-axis([0 100 0 1000]);
+axis([0 90 0 max(Intensity_total(:,3))]);
 
 %% Writing combined data
 %Properties of individual cells
-cd('data/Summary');
-Otput_All_Celldata = ['vertices_all.csv'];
+cd(sum_dir);
+Otput_All_Celldata = 'vertices_all.csv';
 headers = {'Embryo', 'Cell', 'Area', 'Intensity', 'Orientation', 'Eccentricity', 'Elongation', 'Neighbours'};
 csvwrite_with_headers(Otput_All_Celldata,Cells_total, headers);
 
 %Number of cells in each embryo
-Otput_cells_number = ['cell_number.csv'];
+Otput_cells_number = 'cell_number.csv';
 headers2 = {'Embryo', 'Cells'};
 csvwrite_with_headers(Otput_cells_number,Cells_number, headers2);
 
@@ -450,15 +443,14 @@ headers = {'Angle', 'Intensity-BG', 'Intensity', 'Length'};
 csvwrite_with_headers('Intensity_total.csv',Intensity_total, headers);
 
 % Distribution_all_with_BG - after BG subtraction;
-Otput_Graph = ['Distribution_all_with_BG.tif'];
+Otput_Graph = 'Distribution_all_with_BG.tif';
 hold off
 print(image3, '-dtiff', '-r300', Otput_Graph);
 
 % Distribution_all_no_BG - without BG subtraction;
-Otput_Graph = ['Distribution_all_no_BG.tif'];
+Otput_Graph = 'Distribution_all_no_BG.tif';
 hold off
 print(image4, '-dtiff', '-r300', Otput_Graph);
-cd('../../');
-cd('embryo-intensity/');
 
-close all;
+
+cd(currdir);
