@@ -60,7 +60,6 @@ for g=1:numel(files_tif)
     I=imread('tracked_bd.png');
     I2=im2bw(I,1/255);
     I3 = imdilate(I2, [se90I se0I]);
-    cd(currdir);
     % I_cells - inverted image of all cells that are completely in frame;
     % s_cells - individual cells as objects
 
@@ -451,6 +450,3 @@ print(image3, '-dtiff', '-r300', Otput_Graph);
 Otput_Graph = 'Distribution_all_no_BG.tif';
 hold off
 print(image4, '-dtiff', '-r300', Otput_Graph);
-
-
-cd(currdir);

@@ -51,8 +51,7 @@ for g=1:numel(files_tif)
     I=imread('tracked_bd.png');
     I2=im2bw(I,1/255);
     I3 = imdilate(I2, [se90I se0I]);
-    cd(currdir);
-    
+
     % I_cells - inverted image of all cells that are completely in frame;
     % s_cells - individual cells as objects
 
@@ -334,5 +333,4 @@ print(image5, '-dtiff', '-r300', Otput_Graph);
 %Averaged intensity by angle in individual embryos
 headers = {'Wing', 'Intensity-BG', 'Intensity', 'BG'};
 csvwrite_with_headers('Intensity_wing.csv',Intensity_average, headers);
-cd(currdir);
 

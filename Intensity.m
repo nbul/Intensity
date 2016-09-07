@@ -15,6 +15,7 @@ end
 
 %% Determening paths and setting folders
 currdir = pwd;
+addpath(pwd);
 filedir = uigetdir();
 cd(filedir);
 %Folders with images
@@ -44,14 +45,13 @@ sum_dir = [filedir, '/Summary'];
 %Reading 16-bit average intensity projection files
 cd(tif16_dir);
 files_tif = dir('*.tif');
-cd(currdir);
 
 if strcmp(usedefault2, 'Wing');
     Intensity_wing;
 else
     Intensity_embryo;
 end
-
+cd(currdir);
 close all;
 clear variables;
 clc
