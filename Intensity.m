@@ -4,14 +4,14 @@ clear variables
 close all
 
 %% Default settings and script choice
+usedefault2 = questdlg(strcat('Which kind of data is analysed'),'Settings','Embryo','Wing','Wing');
+
 usedefault = questdlg(strcat('Do you want to consider borders with intensity below background'),'Settings','Yes','No','No');
 if strcmp(usedefault, 'No');
     choice = 1;
 else
     choice = 0;
 end
-
-usedefault2 = questdlg(strcat('Which kind of data is analysed'),'Settings','Embryo','Wing','Wing');
 
 %% Determening paths and setting folders
 currdir = pwd;
