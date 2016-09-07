@@ -241,13 +241,13 @@ for g=1:numel(files_tif)
     %% Writing data for individual images
     
     % Borders data: N_distribution_with_BG1 - after BG subtraction, BG;
-    cd(dist1_dir);
+    cd(dist2_dir);
     Otput_Graph = [num2str(g),'_distribution_with_BG.tif'];
     hold off
     print(image1, '-dtiff', '-r300', Otput_Graph);
     
     % N_distribution_no_BG - without BG subtraction;
-    cd(dist2_dir);                     
+    cd(dist1_dir);                     
     Otput_Graph = [num2str(g),'_distribution_no_BG.tif'];
     hold off
     print(image2, '-dtiff', '-r300', Otput_Graph); 
