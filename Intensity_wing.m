@@ -122,8 +122,8 @@ for g=1:numel(files_tif)
         end;
     end
     Cells_number(g,1) = g;
-    Cells_number(g,2) = length(cell_temp);
-    for n=1:length(cell_temp)
+    Cells_number(g,2) = size(cell_temp,1);
+    for n=1:size(cell_temp,1)
         n_all = n_all + 1;
         Cells_total(n_all,1) = g;
         Cells_total(n_all,2) = cell_temp(n,1);
