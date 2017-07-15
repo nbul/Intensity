@@ -40,7 +40,7 @@ for g=1:numel(files_tif)
     cd(bd_dir);
     %Open image with vertices
     V = imread('vertices.png');
-    V = im2bw(V,1/255);
+    V = imbinarize(rgb2gray(V),0);
     % Vdil - dilated image of all vertices
     Vdil = imdilate(V, [se90V se0V]);
     % Individual vertices as objects
@@ -49,7 +49,7 @@ for g=1:numel(files_tif)
     
     %Open image with borders
     I=imread('tracked_bd.png');
-    I2=im2bw(I,1/255);
+    I2=imbinarize(rgb2gray(I),0);
     I3 = imdilate(I2, [se90I se0I]);
 
     % I_cells - inverted image of all cells that are completely in frame;
@@ -64,14 +64,14 @@ for g=1:numel(files_tif)
     % I_borders - all cell-cell borders of the cells that are completely in
     % frame; Junction_cad - individual borders as objects
     I_borders = imsubtract(I3, Vdil);
-    I_borders = im2bw(I_borders, 1/255);
+    I_borders = imbinarize(I_borders, 0);
     cc_borders = bwconncomp(I_borders);
     Junction_cad = regionprops(cc_borders,Cad_im,'MeanIntensity','Orientation','Perimeter', 'centroid', 'Extrema', 'PixelList');
     
     %% Image data: BG and orientation
     % Background and image orientation: measuring summarized background and
     % summarized orietnations of positively and negatively oriented cells
-    for i=1:numel(s_cells);
+    for i=1:numel(s_cells)
         BG=BG+s_cells(i).MeanIntensity;
     end
     
@@ -82,7 +82,7 @@ for g=1:numel(files_tif)
     % at the end of cycle step
     k=0;
     for n=1:numel(s_cells)
-        newImg = im2bw(I,255/255);
+        newImg = imbinarize(rgb2gray(I),255);
         newImg( vertcat( s_cells(n).PixelIdxList ) ) = 1; % getting cell n only
         newImg = imdilate(newImg, [se90I se0I]);
         cc_newImg=bwconncomp(newImg);
@@ -114,12 +114,12 @@ for g=1:numel(files_tif)
         if Vertices3(n)>8
             cell_temp(n-k,:) = [];
             k=k+1;
-        end;
+        end
         
         if Vertices3(n)<3
             cell_temp(n-k,:) = [];
             k=k+1;
-        end;
+        end
     end
     Cells_number(g,1) = g;
     Cells_number(g,2) = size(cell_temp,1);
@@ -152,19 +152,23 @@ for g=1:numel(files_tif)
         for i=1:length(boundary*4)
             if boundary(i,1)-1>0 && boundary(i,2)-1>0
                 boundary_value(i*4-3) = L_cells(boundary(i,1)-1,boundary(i,2)-1);
-            else boundary_value(i*4-3) = 0;
+            else
+                boundary_value(i*4-3) = 0;
             end
             if boundary(i,1)-1>0 && boundary(i,2)<Size_im(2)
                 boundary_value(i*4-2) = L_cells(boundary(i,1)-1,boundary(i,2)+1);
-            else boundary_value(i*4-2) = 0;
+            else
+                boundary_value(i*4-2) = 0;
             end
             if boundary(i,1)+1<Size_im(1)+1 && boundary(i,2)-1>0
                 boundary_value(i*4-1) = L_cells(boundary(i,1)+1,boundary(i,2)-1);
-            else boundary_value(i*4-2) = 0;
+            else
+                boundary_value(i*4-2) = 0;
             end
             if boundary(i,1)+1<Size_im(1)+1 && boundary(i,2)+1<Size_im(2)+1
                 boundary_value(i*4) = L_cells(boundary(i,1)+1,boundary(i,2)+1);
-            else boundary_value(i*4-2) = 0;
+            else
+                boundary_value(i*4-2) = 0;
             end
         end
         boundary_value = unique(boundary_value);

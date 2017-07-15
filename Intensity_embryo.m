@@ -42,7 +42,7 @@ for g=1:numel(files_tif)
     
     
     %% Open images and modify
-   Cad = [num2str(g),'.tif'];
+    Cad = [num2str(g),'.tif'];
     cd(tif16_dir);
     Cad_im = imread(Cad);
     Cad_im2 = uint16(Cad_im);
@@ -50,7 +50,7 @@ for g=1:numel(files_tif)
     cd(bd_dir);
     %Open image with vertices
     V = imread('vertices.png');
-    V = im2bw(V,1/255);
+    V = imbinarize(rgb2gray(V),0);
     % Vdil - dilated image of all vertices
     Vdil = imdilate(V, [se90V se0V]);
     % Individual vertices as objects
@@ -58,7 +58,7 @@ for g=1:numel(files_tif)
     L_Vdil = labelmatrix(cc_Vdil);
     
     I=imread('tracked_bd.png');
-    I2=im2bw(I,1/255);
+    I2=imbinarize(rgb2gray(I),0);
     I3 = imdilate(I2, [se90I se0I]);
     % I_cells - inverted image of all cells that are completely in frame;
     % s_cells - individual cells as objects
@@ -72,14 +72,14 @@ for g=1:numel(files_tif)
     % I_borders - all cell-cell borders of the cells that are completely in
     % frame; Junction_cad - individual borders as objects
     I_borders = imsubtract(I3, Vdil);
-    I_borders = im2bw(I_borders, 1/255);
+    I_borders = imbinarize(I_borders, 0);
     cc_borders=bwconncomp(I_borders);
     Junction_cad=regionprops(cc_borders,Cad_im,'MeanIntensity','Orientation','Perimeter', 'centroid', 'Extrema', 'PixelList');
     
     %% Image data: BG and orientation
     % Background and image orientation: measuring summarized background and
     % summarized orietnations of positively and negatively oriented cells
-    for i=1:numel(s_cells);
+    for i=1:numel(s_cells)
         if s_cells(i).Area>300 && s_cells(i).Area<15000
             if s_cells(i).Orientation>0
                 cell_orientation_pos=cell_orientation_pos+s_cells(i).Orientation;
@@ -103,17 +103,18 @@ for g=1:numel(files_tif)
     
     %Getting summarized orientation of the all cells
     if abs(cell_orientation_pos-cell_orientation_neg)>90
-        for i=1:numel(s_cells);
+        for i=1:numel(s_cells)
             if s_cells(i).Area>300 && s_cells(i).Area<15000
                 if s_cells(i).Orientation<0
                     cell_orientation=cell_orientation+180+s_cells(i).Orientation;
-                else cell_orientation=cell_orientation+s_cells(i).Orientation;
+                else
+                    cell_orientation=cell_orientation+s_cells(i).Orientation;
                 end
             end
             
         end
     else
-        for i=1:numel(s_cells);
+        for i=1:numel(s_cells)
             cell_orientation=cell_orientation+s_cells(i).Orientation;
         end
     end
@@ -126,7 +127,7 @@ for g=1:numel(files_tif)
     k=0;
     for n=1:numel(s_cells)
         if s_cells(n).Area>300 && s_cells(n).Area<15000
-            newImg = im2bw(I,255/255);
+            newImg = imbinarize(rgb2gray(I),255);
             newImg( vertcat( s_cells(n).PixelIdxList ) ) = 1; % getting cell n only
             se90 = strel('line', 4, 90);
             se0 = strel('line', 4, 0);
@@ -160,12 +161,12 @@ for g=1:numel(files_tif)
         if Vertices3(n)>8
             cell_temp(n-k,:) = [];
             k=k+1;
-        end;
+        end
         
         if Vertices3(n)<3
             cell_temp(n-k,:) = [];
             k=k+1;
-        end;
+        end
     end
     Cells_number(g,1) = g;
     Cells_number(g,2) = size(cell_temp,1);
@@ -215,7 +216,7 @@ for g=1:numel(files_tif)
         if length(boundary_value)==2
             q = boundary_value(1,1);
             q2 = boundary_value(1,2);
-            if s_cells(q).Area>300 && s_cells(q2).Area>300 && s_cells(q).Area<15000 && s_cells(q2).Area<15000
+            if s_cells(q).Area>300 && s_cells(q2).Area>300 && s_cells(q).Area<25000 && s_cells(q2).Area<25000
                 if Junction_cad(n).Perimeter/2>5
                     if Junction_cad(n).MeanIntensity>cutoff
                         % Normalizing orientation relative to image
@@ -223,9 +224,11 @@ for g=1:numel(files_tif)
                         if abs(Junction_cad(n).Orientation - cell_orientation)>90
                             if cell_orientation > 0
                                 Junction_cad(n).Orientation = abs(cell_orientation - 180 - Junction_cad(n).Orientation);
-                            else Junction_cad(n).Orientation = abs(cell_orientation + 180 - Junction_cad(n).Orientation);
+                            else
+                                Junction_cad(n).Orientation = abs(cell_orientation + 180 - Junction_cad(n).Orientation);
                             end
-                        else Junction_cad(n).Orientation = abs(cell_orientation - Junction_cad(n).Orientation);
+                        else
+                            Junction_cad(n).Orientation = abs(cell_orientation - Junction_cad(n).Orientation);
                         end
                         % Writing down parametes of individual junctions
                         % that are longer than 5px and are surrounded by
