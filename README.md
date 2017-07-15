@@ -49,16 +49,10 @@ after background subtraction and fitted with a line
 * "Distribution_all_with_BG.tif" - graphs of pulled border intensities vs. angle
 without background subtraction and fitted with a line
 
-<<<<<<< HEAD
-* "Intensity_angles.scv" - pulled data about all cell-cell borders
-
-* "Intensity_wing.scv" or "Intensity_embryo.scv" - averaged data on fluorescence
-=======
 * "Intensity_angles.csv" - pulled data about all cell-cell borders
 
 * "Intensity_wing.csv" or "Intensity_embryo.csv" - averaged data on fluorescence
->>>>>>> origin/master
-intensity from each image. In case of "Intensity_embryo.scv" data is subdivided 
+intensity from each image. In case of "Intensity_embryo.csv" data is subdivided 
 into 0-10, 10-40 and 40-90 angles relative to image orientation. Image orientation
 is calculated as mean orientation of all cells.
 
