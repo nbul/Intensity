@@ -39,7 +39,7 @@ without background subtraction and fitted with a line
 
 1. Folder **Intensity** contains information about all borders intensity in each image
 
-1. Folder **Summary** contains pulled information about all images:
+1. Folder **SummaryIntensity** contains pulled information about all images:
 
 * "cell_number.csv" - number of cells that are completely within image in each image
 
