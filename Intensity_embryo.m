@@ -80,7 +80,7 @@ for g=1:numel(files_tif)
     % Background and image orientation: measuring summarized background and
     % summarized orietnations of positively and negatively oriented cells
     for i=1:numel(s_cells)
-        if s_cells(i).Area>300 && s_cells(i).Area<15000
+        if s_cells(i).Area>smallA && s_cells(i).Area<largeA
             if s_cells(i).Orientation>0
                 cell_orientation_pos=cell_orientation_pos+s_cells(i).Orientation;
                 cells_pos=cells_pos+1;
@@ -104,7 +104,7 @@ for g=1:numel(files_tif)
     %Getting summarized orientation of the all cells
     if abs(cell_orientation_pos-cell_orientation_neg)>90
         for i=1:numel(s_cells)
-            if s_cells(i).Area>300 && s_cells(i).Area<15000
+            if s_cells(i).Area>smallA && s_cells(i).Area<largeA
                 if s_cells(i).Orientation<0
                     cell_orientation=cell_orientation+180+s_cells(i).Orientation;
                 else
@@ -126,7 +126,7 @@ for g=1:numel(files_tif)
     %% Cell data
     k=0;
     for n=1:numel(s_cells)
-        if s_cells(n).Area>300 && s_cells(n).Area<15000
+        if s_cells(n).Area>smallA && s_cells(n).Area<largeA
             newImg = imbinarize(rgb2gray(I),255);
             newImg( vertcat( s_cells(n).PixelIdxList ) ) = 1; % getting cell n only
             se90 = strel('line', 4, 90);
@@ -216,7 +216,7 @@ for g=1:numel(files_tif)
         if length(boundary_value)==2
             q = boundary_value(1,1);
             q2 = boundary_value(1,2);
-            if s_cells(q).Area>300 && s_cells(q2).Area>300 && s_cells(q).Area<25000 && s_cells(q2).Area<25000
+            if s_cells(q).Area>smallA && s_cells(q2).Area>smallA && s_cells(q).Area<largeA && s_cells(q2).Area<largeA
                 if Junction_cad(n).Perimeter/2>5
                     if Junction_cad(n).MeanIntensity>cutoff
                         % Normalizing orientation relative to image

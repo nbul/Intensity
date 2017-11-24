@@ -13,6 +13,16 @@ else
     choice = 0;
 end
 
+usedefault3 = questdlg(strcat('Which kind of data is analysed'),'Settings','Airyscan','Olympus','Olympus');
+
+if strcmp(usedefault3, 'Olympus')
+    smallA = 300;
+    largeA = 15000;
+else
+    smallA = 1500;
+    largeA = 35000;
+end
+
 %% Determening paths and setting folders
 currdir = pwd;
 addpath(pwd);
