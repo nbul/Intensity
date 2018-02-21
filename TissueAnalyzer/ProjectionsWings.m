@@ -89,8 +89,8 @@ for i=1:(numel(files)/2)
          CadnoCD8.max = max(CadnoCD8.max, double(Series.control{plane*2-1,1}));
     end
     
-    CadCD8.average = uint16(CadCD8.average/seriesCount);
-    CadnoCD8.average = uint16(CadnoCD8.average/seriesCount);
+    CadCD8.average = uint16(CadCD8.average*2/seriesCount);
+    CadnoCD8.average = uint16(CadnoCD8.average*2/seriesCount);
     
     CadCD8.background = imopen(CadCD8.max,strel('disk',50));
     CadCD8.max = CadCD8.max - CadCD8.background;

@@ -74,8 +74,8 @@ for i=1:numel(files)
         CD8.average = plus(CD8.average,double(Series{plane*2,1}));
         Cad.max = max(Cad.max, double(Series{plane*2-1,1}));
     end   
-    Cad.average = uint16(Cad.average/seriesCount/2);
-    CD8.average = imadjust(uint16(CD8.average/seriesCount/2));
+    Cad.average = uint16(Cad.average*2/seriesCount);
+    CD8.average = imadjust(uint16(CD8.average*2/seriesCount));
     Cad.background = imopen(Cad.max,strel('disk',50));
     Cad.max = Cad.max - Cad.background;
     Cad.max = imadjust(uint16(Cad.max));
