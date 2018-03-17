@@ -59,7 +59,12 @@ for g=1:numel(files_tif)
     
     I=imread('handCorrection.tif');
     I2=imbinarize(rgb2gray(I),0);
+    I2(:,1) = 0;
+    I2(:,end) = 0;
+    I2(1,:) = 0;
+    I2(end,:) = 0;
     I3 = imdilate(I2, [se90I se0I]);
+    
     % I_cells - inverted image of all cells that are completely in frame;
     % s_cells - individual cells as objects
 
