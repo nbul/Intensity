@@ -17,7 +17,7 @@ usedefault3 = questdlg(strcat('Which kind of data is analysed'),'Settings','Airy
 
 if strcmp(usedefault3, 'Olympus')
     smallA = 300;
-    largeA = 15000;
+    largeA = 25000;
 else
     smallA = 1500;
     largeA = 35000;
