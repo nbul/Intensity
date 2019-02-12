@@ -1,0 +1,45 @@
+clc
+clear variables
+close all
+%% Determening paths and setting folders
+currdir = pwd;
+addpath(pwd);
+filedir = uigetdir();
+cd(filedir);
+
+GFP_dir =[filedir, '/GFP'];
+Cherry_dir =[filedir, '/Cherry'];
+border_dir =[filedir, '/borders'];
+
+if exist([filedir,'/summary'],'dir') == 0
+    mkdir(filedir,'/summary');
+end
+sum_dir = [filedir, '/summary'];
+
+if exist([filedir,'/images'],'dir') == 0
+    mkdir(filedir,'/images');
+end
+im_dir = [filedir, '/images'];
+
+for loop=1:length(files)
+    cd(GFP_dir);
+    GFP_file = [num2str(loop),'.tif'];
+    ImageGFP = imread(GFP_file);
+    cd(Cherry_dir);
+    Cherry_file = [num2str(loop),'.tif'];
+    ImageCherry = imread(Cherry_file);
+    cd(border_dir);
+    Path = [border_dir, '/', num2str(loop),'/'];
+    cd(Path);
+    Image_borders = imread('handCorrection.tif');
+    
+    borders;
+    
+    images;
+    
+    for k = 1:numel(b_valid)
+        object_Cherry = im2double(ImageCherry) .*...
+            poly2mask(b_valid{k}(:,2),b_valid{k}(:,1),im_x,im_y);
+        
+    end
+end
