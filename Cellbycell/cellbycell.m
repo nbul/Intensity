@@ -133,3 +133,7 @@ image1=figure;
 plot(alldata2(:,3),alldata2(:,2),'o');
 print(image1, '-dtiff', '-r150', 'pulled_plot3.tif');
 close all
+
+cd(currdir);
+clear variables
+clc
