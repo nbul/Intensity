@@ -4,11 +4,6 @@ clear variables
 close all
 
 
-%Folder to save information about cells
-if exist([filedir, '/Zdata'],'dir') == 0
-    mkdir(filedir,'/Zdata');
-end
-result_dir = [filedir, '/Zdata'];
 
 %% Determening paths and setting folders
 currdir = pwd;
@@ -18,6 +13,12 @@ cd(filedir);
 %Folders with images
 tif8_dir =[filedir, '/borders'];
 oib_dir = [filedir, '/originals'];
+%Folder to save information about cells
+if exist([filedir, '/Zdata'],'dir') == 0
+    mkdir(filedir,'/Zdata');
+end
+result_dir = [filedir, '/Zdata'];
+
 
 step = 0.38;
 x = step*(0:1:5);
