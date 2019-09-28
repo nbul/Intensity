@@ -37,7 +37,7 @@ The following columns record cell-by-cell data:
 1. **Mean** - mean of the distribution of mean signal at the border along the z-axis.
 1. **Total** - surface under the distribution of mean signal at the border along the z-axis calculated using *trapz* function and multiplied by the size of the mask used for extracting the border signal in each cell.
 1. **Zposition** - position of the center of the Gaussian fit.
-1. **Width** - \sigma of the Gaussian distribution related to the full width at half maximum (FWHM) as FWHM \approx 2.355*\sigma);
+1. **Width** - &sigma of the Gaussian distribution related to the full width at half maximum (FWHM) as FWHM ≈ 2.355*&sigma);
 1. **Area** - area in pixels of each cell.
 1. **Eccentricity** - eccentricity of each cell.
 In the files with averaged data each value will be followed by it standard deviation in the next column.
