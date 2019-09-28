@@ -1,7 +1,7 @@
 cd(oib_dir);
-
+zsection = struct([]);
 %% read image
-Number1 = [num2str(k),'.oib'];
+Number1 = [num2str(k),fileformat];
 
 I=bfopen(Number1);
 counter = 0;
@@ -12,6 +12,7 @@ for i=1:seriesCount
     metadata = Series{i, 2};
     if contains(metadata,channel) == true
       counter = counter + 1;
-      
+      zsection{counter} = Series{i, 1};
     end
 end
+
