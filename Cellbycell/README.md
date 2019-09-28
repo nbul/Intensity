@@ -14,7 +14,7 @@ tracked_bd.png and vertices.png files from Packing Analyser.
 ## Running the script
 1. Start by running Intensity_wing.m
 
-1. It gives choice to analyse embryos or wings.
+1. It gives choice to select several options: channel to be analysed, the cutoff value for the goodness-of-fit, z-step in the stack, and format of the original microscopy files.
 
 
 ## Output files and format
