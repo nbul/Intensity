@@ -55,7 +55,7 @@ Fit_dir = [filedir, '/Distributions_fit'];
 
 %Reading 16-bit average intensity projection files
 cd(oib_dir);
-files_tif = dir(fileformat);
+files_tif = dir(['*', fileformat]);
 
 averagedata = zeros(numel(files_tif),15);
 averagedata2 = zeros(numel(files_tif),15);
