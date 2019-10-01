@@ -4,7 +4,7 @@ I2 = imdilate(I, [se90I se0I]);
 imshow(I2);
 hold on;
 for l = 1:length(b_valid)
-    clear boundary_valid
+    clear boundary
     boundary = b_valid{l};
     c = im_cells_data(cell_data(l,2)).Centroid;
     c_labels = text(c(1), c(2), sprintf('%d', l),'HorizontalAlignment', 'center',...

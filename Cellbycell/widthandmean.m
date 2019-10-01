@@ -20,7 +20,7 @@ for i=1:numel(b_valid)
     width1(i) = sqrt(curve{i}.c1*curve{i}.c1/2)';
     pvalue(i) = gof{i}.rsquare';
     Intensity(i) = mean(mI_bg(:,i));
-    Total(i) = trapz(mI_bg(:,i))*msize(i);
+    Total(i) = trapz(mI_bg(:,i))*length(b_valid{i});
     subplot(4, ceil(numel(b_valid)/4),i);
     plot(binrange', mI_bg(:,i), 'o', binrange', curve{i}(binrange'));
     title(num2str(gof{i}.rsquare));

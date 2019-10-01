@@ -19,7 +19,7 @@ cell_data = zeros(1, 4);
 b_valid = cell(0);
 cell_counter = 0;
 for i=1:numel(im_cells_data)
-        if sum(A(:,i)) == 0
+        if sum(A(:,i)) == 0 && isempty(find(A(i,:), 1)) == 0 
             cell_counter = cell_counter + 1;
             cell_data(cell_counter,1) = cell_counter;
             cell_data(cell_counter,2) = i;

@@ -12,8 +12,8 @@ cd(filedir);
 b_dir =[filedir, '/borders']; 
 oib_dir = [filedir, '/originals'];
 %dilation of borders
-se90I = strel('line', 20, 90);
-se0I = strel('line', 20, 0);
+se90I = strel('line', 10, 90);
+se0I = strel('line', 5, 0);
 ch= 1;
 cutoff = 0.9;
 bin_size = 0.15;
@@ -96,6 +96,7 @@ T4.Properties.VariableNames = {'wing', 'Mean','SDmean',...
 writetable(T4, 'avaragesbywing_cutoff.csv');
 
 pulled2 = pulled2(2:end,:);
+%pulled2 = pulled(
 
 T5 = array2table(pulled2);
 
