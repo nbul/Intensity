@@ -1,5 +1,4 @@
-# Cellbycell
-
+# Wing discs
 This script is to quantify cell-cell borders fluorescence intensities on cell-by-cell basis.
 
 ## Input data
