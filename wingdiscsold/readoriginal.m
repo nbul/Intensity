@@ -18,4 +18,4 @@ for i=1:seriesCount
     end
 end
 
-Projection = Projection/seriesCount;
+Projection = Projection/counter;
