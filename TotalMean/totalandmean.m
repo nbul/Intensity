@@ -16,7 +16,7 @@ tif_dir = [filedir, '/tifs_original'];
 cd(tif_dir);
 files_tif = dir('*.tif');
 
-summary = zeros(numel(files_tif),14);
+summary = zeros(numel(files_tif),16);
 
 for k=1:numel(files_tif)
     cd(tif_dir);
@@ -74,14 +74,16 @@ for k=1:numel(files_tif)
     end
    
     summary(k,:) = [k, mean(MICyto), std(MICyto), mean(TICyto), std(TICyto),mean(Area), std(Area),...
-        mean(MIBorder), std(MIBorder), mean(TIBorder), std(TIBorder),mean(Perimeter), std(Perimeter), counter];
+        mean(MIBorder), std(MIBorder), mean(TIBorder), std(TIBorder),mean(Perimeter), std(Perimeter),...
+        mean(TICyto./TIBorder), std(TICyto./TIBorder), counter];
     
 end
 
 cd(filedir);
 all = array2table(summary);
 all.Properties.VariableNames = {'Wing', 'MeanCyto', 'stdMeanCyto', 'TotalCyto', 'sdtTotalCyto', 'Area', 'stdArea',...
-    'MeanBorders', 'sdtMeanBorders', 'TotalBorders', 'stdTotalBorders', 'Perimeter', 'stdPerimeter', 'Cells'};
+    'MeanBorders', 'sdtMeanBorders', 'TotalBorders', 'stdTotalBorders', 'Perimeter', 'stdPerimeter',...
+    'RatioCytoAJ','stdRatio','Cells'};
 writetable(all,'Intensity.csv');
 cd(currdir);
 
