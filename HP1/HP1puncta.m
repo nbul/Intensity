@@ -10,7 +10,7 @@ filedir = uigetdir();
 cd(filedir);
 
 
-HP1 = '4DAPI.tif';
+HP1 = '7DAPI.tif';
 HP1_im = imread(HP1);
 HP1_im = imadjust(imgaussfilt(HP1_im,2));
 level = graythresh(HP1_im);
@@ -19,7 +19,7 @@ level = graythresh(HP1_im);
 BW = double(imbinarize(HP1_im,level));
 imshow(BW);
 
-Mask = '4mask.tif';
+Mask = '7mask.tif';
 Mask_im = imread(Mask);
 Mask_im = double(imbinarize(Mask_im));
 
