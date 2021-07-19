@@ -322,7 +322,7 @@ for g=1:numel(files_tif)
     ylabel('Fluorescence intensity', 'fontsize',16,'fontweight','b');
     hold on
     plot(x, y1 , '-b', 'LineWidth',3);
-    text_control = ['embryo', num2str(g), ': ', num2str(equation1(1,2), precision) ' + ' num2str(equation1(1,1), precision) '*x' ];
+    text_control = ['wing', num2str(g), ': ', num2str(equation1(1,2), precision) ' + ' num2str(equation1(1,1), precision) '*x' ];
     text(98, 50, text_control, 'HorizontalAlignment','right', 'fontsize',14, 'fontweight','b');
     axis([0 90 0 max(intensity(:,2))]);
     
@@ -335,7 +335,7 @@ for g=1:numel(files_tif)
     ylabel('Fluorescence intensity', 'fontsize',16,'fontweight','b');
     hold on
     plot(x, y2 , '-b', 'LineWidth',3);
-    text_control = ['embryo', num2str(g), ': ', num2str(equation2(1,2), precision) ' + ' num2str(equation2(1,1), precision) '*x' ];
+    text_control = ['wing', num2str(g), ': ', num2str(equation2(1,2), precision) ' + ' num2str(equation2(1,1), precision) '*x' ];
     text(98, 50, text_control, 'HorizontalAlignment','right', 'fontsize',14, 'fontweight','b');
     axis([0 90 0 max(intensity(:,3))]);
     
