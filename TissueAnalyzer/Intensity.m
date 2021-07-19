@@ -4,7 +4,7 @@ clear variables
 close all
 
 %% Default settings and script choice
-usedefault2 = questdlg(strcat('Which kind of data is analysed'),'Settings','Embryo','Wing','Wing');
+usedefault2 = questdlg(strcat('Which kind of data is analysed'),'Settings','Embryo','Wing','Pupal wing', 'Wing');
 
 usedefault = questdlg(strcat('Do you want to consider borders with intensity below background'),'Settings','Yes','No','No');
 if strcmp(usedefault, 'No')
@@ -68,8 +68,10 @@ files_tif = dir('*.tif');
 
 if strcmp(usedefault2, 'Wing')
     Intensity_wing;
-else
+elseif strcmp(usedefault2, 'Embryo')
     Intensity_embryo;
+else
+    Intensity_pupalwings;
 end
 cd(currdir);
 close all;
