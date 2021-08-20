@@ -5,8 +5,8 @@ n_all = 0; % Counter for all cells
 
 Intensity_total = zeros(1,4); % Intensity of all individual borders in all embryos
 Intensity_average = zeros(1,8);
-Intensity_10 = zeros(1,4); % Intensity of individual borders 0-10° in all embryos
-Intensity_40 = zeros(1,4); % Intensity of individual borders 10-40° in all embryos
+Intensity_30 = zeros(1,4); % Intensity of individual borders 0-10° in all embryos
+Intensity_60 = zeros(1,4); % Intensity of individual borders 10-40° in all embryos
 Intensity_90 = zeros(1,4); % Intensity of individual borders 40-90° in all embryos
 n_0_90 = 0; % Number of all individual borders in all embryos
 n10=0; % Number of individual borders 0-10° in all embryos
@@ -19,8 +19,8 @@ x = -90:0.5:90;
 se90V = strel('line', 8, 90);
 se0V = strel('line', 7, 0);
 %dilation of borders
-se90I = strel('line', 2, 90);
-se0I = strel('line', 2, 0);
+se90I = strel('line', 4, 90);
+se0I = strel('line', 4, 0);
 % dilation cell
 se90 = strel('line', 4, 90);
 se0 = strel('line', 4, 0);
@@ -190,15 +190,7 @@ for g=1:numel(files_tif)
     
     %% Borders data
     k=0;
-    Intensity10 = 0;
-    Intensity40 = 0;
-    Intensity90 = 0;
-    Intensity10_BG = 0;
-    Intensity40_BG = 0;
-    Intensity90_BG = 0;
-    k10=0;
-    k40=0;
-    k90=0;
+
     
     %setting cutoff values for border intensity
     if choice == 1
@@ -227,15 +219,15 @@ for g=1:numel(files_tif)
                     if Junction_cad(n).MeanIntensity>cutoff
                         % Normalizing orientation relative to image
                         % (average cell) orientation)
-                        if abs(Junction_cad(n).Orientation - cell_orientation)>90
-                            if cell_orientation > 0
-                                Junction_cad(n).Orientation = abs(cell_orientation - 180 - Junction_cad(n).Orientation);
-                            else
-                                Junction_cad(n).Orientation = abs(cell_orientation + 180 - Junction_cad(n).Orientation);
-                            end
-                        else
-                            Junction_cad(n).Orientation = abs(cell_orientation - Junction_cad(n).Orientation);
-                        end
+%                         if abs(Junction_cad(n).Orientation - cell_orientation)>90
+%                             if cell_orientation > 0
+%                                 Junction_cad(n).Orientation = abs(cell_orientation - 180 - Junction_cad(n).Orientation);
+%                             else
+%                                 Junction_cad(n).Orientation = abs(cell_orientation + 180 - Junction_cad(n).Orientation);
+%                             end
+%                         else
+%                             Junction_cad(n).Orientation = abs(cell_orientation - Junction_cad(n).Orientation);
+%                         end
                         % Writing down parametes of individual junctions
                         % that are longer than 5px and are surrounded by
                         % cells with area>1000px and are completely within
@@ -246,42 +238,6 @@ for g=1:numel(files_tif)
                         intensity(k,3) = Junction_cad(n).MeanIntensity;
                         intensity(k,4) = Junction_cad(n).Perimeter/2;
                         
-                        %Writing intensity into a summarizes files
-                        if intensity(k,1)<=30
-                            k10=k10+1;
-                            Intensity10 = Intensity10 + intensity(k,2);
-                            Intensity10_BG = Intensity10_BG + intensity(k,3);
-                            n10=n10+1;
-                            Intensity_10(n10,1) = intensity(k,1);
-                            Intensity_10(n10,2) = intensity(k,2);
-                            Intensity_10(n10,3) = intensity(k,3);
-                            Intensity_10(n10,4) = intensity(k,4);
-                        end
-                        if (intensity(k,1)>30 && intensity(k,1)<=60)
-                            k40=k40+1;
-                            Intensity40 = Intensity40 + intensity(k,2);
-                            Intensity40_BG = Intensity40_BG + intensity(k,3);
-                            n40=n40+1;
-                            Intensity_40(n40,1) = intensity(k,1);
-                            Intensity_40(n40,2) = intensity(k,2);
-                            Intensity_40(n40,3) = intensity(k,3);
-                            Intensity_40(n40,4) = intensity(k,4);
-                        end
-                        if intensity(k,1)>60
-                            k90=k90+1;
-                            Intensity90 = Intensity90 + intensity(k,2);
-                            Intensity90_BG = Intensity90_BG + intensity(k,3);
-                            n90=n90+1;
-                            Intensity_90(n90,1) = intensity(k,1);
-                            Intensity_90(n90,2) = intensity(k,2);
-                            Intensity_90(n90,3) = intensity(k,3);
-                            Intensity_90(n90,4) = intensity(k,4);
-                        end
-                        n_0_90 = n_0_90 + 1;
-                        Intensity_total(n_0_90,1) = intensity(k,1);
-                        Intensity_total(n_0_90,2) = intensity(k,2);
-                        Intensity_total(n_0_90,3) = intensity(k,3);
-                        Intensity_total(n_0_90,4) = intensity(k,4);
                     end
                     
                 end
@@ -289,71 +245,28 @@ for g=1:numel(files_tif)
         end
     end
     % Sorting borders by angle
-    intensity=sortrows(intensity,1);
+   
+    
+    
     
     %% Summary of cell borders
-    Intensity10 = Intensity10/k10;
-    Intensity40 = Intensity40/k40;
-    Intensity90 = Intensity90/k90;
-    Intensity10_BG = Intensity10_BG/k10;
-    Intensity40_BG = Intensity40_BG/k40;
-    Intensity90_BG = Intensity90_BG/k90;
-    Intensity_average(g,1) = g;
-    Intensity_average(g,2) = Intensity10;
-    Intensity_average(g,3) = Intensity40;
-    Intensity_average(g,4) = Intensity90;
-    Intensity_average(g,5) = Intensity10_BG;
-    Intensity_average(g,6) = Intensity40_BG;
-    Intensity_average(g,7) = Intensity90_BG;
-    Intensity_average(g,8) = BG;
+    Intensity30 = mean(intensity(abs(intensity(:,1))<30,3));
+    Intensity60 = mean(intensity(abs(intensity(:,1))>= 30 & abs(intensity(:,1))< 60,3));
+    Intensity90 = mean(intensity(abs(intensity(:,1)) >= 60,3));
+    Intensity30_BG = mean(intensity(abs(intensity(:,1))<30,2));
+    Intensity60_BG = mean(intensity(abs(intensity(:,1))>= 30 & abs(intensity(:,1))< 60,2));
+    Intensity90_BG = mean(intensity(abs(intensity(:,1)) >= 60,2));   
     
-    %% Fitting and plotting
-    equation1=polyfit(intensity(:,1),intensity(:,2),1); % With background subtraction
-    equation2=polyfit(intensity(:,1),intensity(:,3),1); % Without background subtraction
-    y1 = equation1(1,1)*x + equation1(1,2);
-    y2 = equation2(1,1)*x + equation2(1,2);
+    Intensity_average(g,:) = [g, Intensity30, Intensity60, Intensity90, Intensity30_BG, Intensity60_BG, Intensity90_BG, BG];
     
-    % Plot image of fitted intensities after background subtraction
-    image1=figure;
-    set(axes,'FontSize',16);
-    plot(intensity(:,1),intensity(:,2), 'o', 'Color','b', 'MarkerSize',4, 'MarkerFaceColor', 'b');
-    title('Fluorescence vs relative angle after background subtraction', 'fontsize',18,'fontweight','b')
-    xlabel('Relative angle', 'fontsize',16,'fontweight','b');
-    ylabel('Fluorescence intensity', 'fontsize',16,'fontweight','b');
-    hold on
-    plot(x, y1 , '-b', 'LineWidth',3);
-    text_control = ['wing', num2str(g), ': ', num2str(equation1(1,2), precision) ' + ' num2str(equation1(1,1), precision) '*x' ];
-    text(98, 50, text_control, 'HorizontalAlignment','right', 'fontsize',14, 'fontweight','b');
-    axis([0 90 0 max(intensity(:,2))]);
+    Intensity_30 = [Intensity_30; intensity(abs(intensity(:,1))<30,:)]; %#ok<AGROW>
+    Intensity_60 = [Intensity_60; intensity(abs(intensity(:,1))>= 30 & abs(intensity(:,1))< 60,:)]; %#ok<AGROW>
+    Intensity_90 = [Intensity_90; intensity(abs(intensity(:,1))>= 60,:)]; %#ok<AGROW>
     
-    % Plot image of fitted intensities without background subtraction
-    image2=figure;
-    set(axes,'FontSize',16);
-    plot(intensity(:,1),intensity(:,3), 'o', 'Color','b', 'MarkerSize',4, 'MarkerFaceColor', 'b');
-    title('Fluorescence vs relative angle without background subtraction', 'fontsize',18,'fontweight','b')
-    xlabel('Relative angle', 'fontsize',16,'fontweight','b');
-    ylabel('Fluorescence intensity', 'fontsize',16,'fontweight','b');
-    hold on
-    plot(x, y2 , '-b', 'LineWidth',3);
-    text_control = ['wing', num2str(g), ': ', num2str(equation2(1,2), precision) ' + ' num2str(equation2(1,1), precision) '*x' ];
-    text(98, 50, text_control, 'HorizontalAlignment','right', 'fontsize',14, 'fontweight','b');
-    axis([0 90 0 max(intensity(:,3))]);
+    intensity(intensity(:,1)<0,1) = intensity(intensity(:,1)<0,1) + 180;
+    Intensity_total = [Intensity_total; intensity]; %#ok<AGROW>
     
     %% Writing data for individual images
-    % Borders data: N_distribution_with_BG - after BG subtraction;
-    % Borders data: N_distribution_with_BG1 - after BG subtraction, BG;
-    cd(dist2_dir);
-    Otput_Graph = [num2str(g),'_distribution_with_BG.tif'];
-    hold off
-    print(image1, '-dtiff', '-r300', Otput_Graph);
-    
-    % N_distribution_no_BG - without BG subtraction;
-    cd(dist1_dir);                     
-    Otput_Graph = [num2str(g),'_distribution_no_BG.tif'];
-    hold off
-    print(image2, '-dtiff', '-r300', Otput_Graph); 
-    
-    
     % N_intensity - information about individual borders;
     cd(int_dir);
     Otput_Intensity = [num2str(g),'_intensity.csv'];
@@ -372,58 +285,26 @@ end
 
 %% All intensities by angles
 %Sorting arrays by angle and extending to 10000
-Intensity_10=sortrows(Intensity_10,1);
-Intensity_10=wextend('ar','zpd', Intensity_10, (10000-length(Intensity_10(:,1))),'d');
-Intensity_40=sortrows(Intensity_40,1);
-Intensity_40=wextend('ar','zpd', Intensity_40, (10000-length(Intensity_40(:,1))),'d');
+Intensity_30(1,:) = [];
+Intensity_30=sortrows(Intensity_30,1);
+Intensity_30=wextend('ar','zpd', Intensity_30, (10000-length(Intensity_30(:,1))),'d');
+
+Intensity_60(1,:) = [];
+Intensity_60=sortrows(Intensity_60,1);
+Intensity_60=wextend('ar','zpd', Intensity_60, (10000-length(Intensity_60(:,1))),'d');
+
+Intensity_90(1,:) = [];
 Intensity_90=sortrows(Intensity_90,1);
 Intensity_90=wextend('ar','zpd', Intensity_90, (10000-length(Intensity_90(:,1))),'d');
 
+Intensity_total(1,:) = [];
+Intensity_total = sortrows(Intensity_total,1);
+
 %Combining arrays into a single array
-Intensity_angle = [Intensity_10 Intensity_40 Intensity_90];
+Intensity_angle2 = [Intensity_30 Intensity_60 Intensity_90];
 %Removing extra 0s
-Intensity_angle2 = Intensity_angle;
-t=0;
-for m=1:size(Intensity_angle, 1)
-    if (Intensity_angle(m,1) == 0) && (Intensity_angle(m,2) == 0)
-        Intensity_angle2(m-t, :) = [];
-        t=t+1;
-    end
-end
+Intensity_angle2(sum(Intensity_angle2, 2) == 0,:) = [];
 
-
-%% Plotting summarized data
-%Fitting summarized data with lines
-equation1=polyfit(Intensity_total(:,1),Intensity_total(:,2),1); %with background subtraction
-equation2=polyfit(Intensity_total(:,1),Intensity_total(:,3),1); % without background subtraction
-y1 = equation1(1,1)*x + equation1(1,2);
-y2 = equation2(1,1)*x + equation2(1,2);
-
-% Plot image of fitted intensities after background subtraction
-image3=figure;
-set(axes,'FontSize',16);
-plot(Intensity_total(:,1),Intensity_total(:,2), 'o', 'Color','b', 'MarkerSize',4, 'MarkerFaceColor', 'b');
-title('Fluorescence vs relative angle after background subtraction', 'fontsize',18,'fontweight','b')
-xlabel('Relative angle', 'fontsize',16,'fontweight','b');
-ylabel('Fluorescence intensity', 'fontsize',16,'fontweight','b');
-hold on
-plot(x, y1 , '-b', 'LineWidth',3);
-text_control = ['wing', num2str(g), ': ', num2str(equation1(1,2), precision) ' + ' num2str(equation1(1,1), precision) '*x' ];
-text(98, 50, text_control, 'HorizontalAlignment','right', 'fontsize',14, 'fontweight','b');
-axis([0 90 0 max(Intensity_total(:,2))]);
-
-% Plot image of fitted intensities without background subtraction
-image4=figure;
-set(axes,'FontSize',16);
-plot(Intensity_total(:,1),Intensity_total(:,3), 'o', 'Color','b', 'MarkerSize',4, 'MarkerFaceColor', 'b');
-title('Fluorescence vs relative angle without background subtraction', 'fontsize',18,'fontweight','b')
-xlabel('Relative angle', 'fontsize',16,'fontweight','b');
-ylabel('Fluorescence intensity', 'fontsize',16,'fontweight','b');
-hold on
-plot(x, y2 , '-b', 'LineWidth',3);
-text_control = ['wing', num2str(g), ': ', num2str(equation2(1,2), precision) ' + ' num2str(equation2(1,1), precision) '*x' ];
-text(98, 50, text_control, 'HorizontalAlignment','right', 'fontsize',14, 'fontweight','b');
-axis([0 90 0 max(Intensity_total(:,3))]);
 
 %% Writing combined data
 %Properties of individual cells
@@ -449,13 +330,3 @@ csvwrite_with_headers('Intensity_embryo.csv',Intensity_average, headers);
 Intensity_total=sortrows(Intensity_total,1);
 headers = {'Angle', 'Intensity-BG', 'Intensity', 'Length'};
 csvwrite_with_headers('Intensity_total.csv',Intensity_total, headers);
-
-% Distribution_all_with_BG - after BG subtraction;
-Otput_Graph = 'Distribution_all_with_BG.tif';
-hold off
-print(image3, '-dtiff', '-r300', Otput_Graph);
-
-% Distribution_all_no_BG - without BG subtraction;
-Otput_Graph = 'Distribution_all_no_BG.tif';
-hold off
-print(image4, '-dtiff', '-r300', Otput_Graph);
