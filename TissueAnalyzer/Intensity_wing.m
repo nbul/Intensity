@@ -1,3 +1,34 @@
+%% Folders
+%Folder to save information about cells
+if exist([filedir, '/Cells'],'dir') == 0
+    mkdir(filedir,'/Cells');
+end
+cells_dir = [filedir, '/Cells'];
+
+%Folder to save images with distributions after BG subtraction 
+if exist([filedir, '/Distribution no BG'],'dir') == 0
+    mkdir(filedir,'/Distribution no BG');
+end
+dist1_dir = [filedir, '/Distribution no BG'];
+
+%Folder to save images with distributions without BG subtraction
+if exist([filedir, '/Distribution with BG'],'dir') == 0
+    mkdir(filedir,'/Distribution with BG');
+end
+dist2_dir = [filedir, '/Distribution with BG'];
+
+%Folder to save intensity information from individual images
+if exist([filedir, '/Intensity'],'dir') == 0
+    mkdir(filedir,'/Intensity');
+end
+int_dir = [filedir, '/Intensity'];
+
+%Folder to save summarised information
+if exist([filedir, '/SummaryIntensity'],'dir') == 0
+    mkdir(filedir,'/SummaryIntensity');
+end
+sum_dir = [filedir, '/SummaryIntensity'];
+
 %% Assigning memory
 Cells_total = zeros(1,6); % Information about all cells from all images
 Cells_number = zeros(1,2); % Number of cells in all images

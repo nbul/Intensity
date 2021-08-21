@@ -171,7 +171,7 @@ for g=1:numel(files_tif)
     cell_temp(cell_temp(:,7) < 3 & cell_temp(:,7) > 8,:) = [];    
     Cells_number(g,:) = [g, mean(cell_temp(:,2:end)), size(cell_temp,1)];
     
-    Cells_total = [Cells_total; [ones(size(cell_temp,1),1)*g, cell_temp]]; %#ok<AGROW>
+    Cells_total = [Cells_total; [ones(Cells_number(g,2),1)*g, cell_temp]]; %#ok<AGROW>
     
     %% Borders data
     k=0;
@@ -317,7 +317,7 @@ writetable(Cells_totalT,'summary.xls','Sheet','cell_data');
 Cells_numberT = array2table(Cells_number);
 Cells_numberT.Properties.VariableNames = {'Wing', 'Area','Intensity','Orientation','Eccentricity',...
     'Elongation','Vertices','CellNumber'};
-writetable(Cells_numberT,'summary.xls','Sheet','cell data');
+writetable(Cells_numberT,'summary.xls','Sheet','cell_number');
 
 %Combined intensities at cell borders by angle in all embryos
 % headers2 = {'0-30angels', 'Intensity', 'Intensity+BG', 'Length', '30-60angels', 'Intensity', 'Intensity+BG', 'Length', '60-90angels','Intensity', 'Intensity+BG', 'Length',};
