@@ -50,30 +50,35 @@ for k=1:numel(files_tif)
             [B2,L2, N2, A2] = bwboundaries(I2,'holes');
             im_cells_data=regionprops(L2,Signal,'Eccentricity', 'Area','Centroid', 'MeanIntensity');
             for n=1:numel(im_cells_data)
-                if sum(A2(:,n)) == 0
+                if sum(A2(:,n)) == 0 && im_cells_data(n).Area >500
                     counter = counter + 1;
-                    MICyto(counter) = im_cells_data(n).MeanIntensity; % Mean intensity of cytoplasm
+                    %MICyto(counter) = im_cells_data(n).MeanIntensity; % Mean intensity of cytoplasm
                     Area(counter) = im_cells_data(n).Area; % Area
-                    TICyto(counter) = MICyto(counter) .* Area(counter); % Total intensity cytoplasm
+                    %TICyto(counter) = MICyto(counter) .* Area(counter); % Total intensity cytoplasm
                     Perimeter(counter) = length(B2{n});
-                    
                     Itemp2 = zeros(im_x,im_y);
                     for m = 1:Perimeter(counter)
                         Itemp2(B2{n}(m,1),B2{n}(m,2)) = 1;
                     end
-                    Itemp2 = imdilate(Itemp2, strel('diamond', 3));
+                    Itemp2 = imdilate(Itemp2, strel('diamond', 4));
+                    Itemp3 = imclearborder(imcomplement(Itemp2));
                     Itemp2 = double(Itemp2) .* double(Signal);
+                    Itemp3 = double(Itemp3) .* double(Signal);
                     Itemp2 = Itemp2(:);
                     Itemp2(Itemp2 == 0) = [];
+                    Itemp3 = Itemp3(:);
+                    Itemp3(Itemp3 == 0) = [];
                     MIBorder(counter) = mean(Itemp2);
                     TIBorder(counter) = sum(Itemp2);
+                    MICyto(counter) = mean(Itemp3);
+                    TICyto(counter) = sum(Itemp3);
                 end
             end
 
         end
     end
    
-    summary(k,:) = [k, mean(MICyto), std(MICyto), mean(TICyto), std(TICyto),mean(Area), std(Area),...
+    summary(k,:) = [k, mean(MICyto(~isnan(MICyto))), mean(MICyto(~isnan(MICyto))), mean(TICyto), std(TICyto),mean(Area), std(Area),...
         mean(MIBorder), std(MIBorder), mean(TIBorder), std(TIBorder),mean(Perimeter), std(Perimeter),...
         mean(TICyto./TIBorder), std(TICyto./TIBorder), counter];
     
