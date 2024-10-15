@@ -1,0 +1,38 @@
+%% Clear all and initial parameters
+clc
+clear variables
+close all
+
+%% Determening paths and setting folders
+currdir = pwd;
+addpath(pwd);
+filedir = uigetdir();
+cd(filedir);
+files_tif = dir('*.tif');
+data_pulled = zeros(1,7);
+
+for loop = 1:length(files_tif)
+    Signal = imread(files_tif(loop).name);
+    
+    %x = sscanf(files_tif(loop).name,'%d_cp_masks.png');
+    Signal2 = imgaussfilt(Signal,2);
+    T = graythresh(rescale(Signal2));
+    Signal3 = imbinarize(rescale(Signal2), T*1.6);
+    Signal3 = bwareaopen(Signal3,150);
+    Signal3 = imclearborder(Signal3);
+    Signal4 = imbinarize(rescale(Signal2), 'adaptive', 'Sensitivity', 0.2);
+    Signal4 = bwareaopen(Signal4,200);
+    Signal4 = imclearborder(Signal4);
+    cc3 = bwconncomp(Signal3);
+    cc4 = bwconncomp(Signal4);
+    data3= regionprops(cc3,Signal, 'Area',)
+end
+data_pulled(1,:) = [];
+data_table = array2table(data_pulled);
+data_table.Properties.VariableNames = {'Image', 'Area',...
+    'Eccentricity', 'MeanIntensity',...
+'FociNumber','FociArea','FociIntensity'};
+writetable(data_table, 'summary.csv');
+cd(currdir);
+clc
+clear variables;
